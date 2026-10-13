@@ -132,3 +132,33 @@ if "Timestamp" in trend_data.columns and "AC Output" in trend_data.columns:
     )
 else:
     st.warning("Required time or power columns were not found.")
+    st.divider()
+st.header("Solar Panel Degradation Check")
+
+st.write(
+    "Compare solar power output over time to investigate possible performance decline."
+)
+
+if "AC Output" in trend_data.columns:
+    output = pd.to_numeric(trend_data["AC Output"], errors="coerce").dropna()
+
+    if len(output) >= 20:
+        first_period = output.head(max(1, len(output) // 5)).mean()
+        last_period = output.tail(max(1, len(output) // 5)).mean()
+
+        if first_period > 0:
+            change = ((first_period - last_period) / first_period) * 100
+
+            st.metric(
+                "Change in Average Output",
+                f"{change:.1f}%"
+            )
+
+            st.caption(
+                "This is a comparison between early and late records, "
+                "not a verified panel degradation rate."
+            )
+        else:
+            st.info("Not enough positive initial output to calculate the comparison.")
+    else:
+        st.info("More records are needed for this comparison.")
