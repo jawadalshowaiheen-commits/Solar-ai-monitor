@@ -17,8 +17,14 @@ st.write("A machine-learning model trained on solar power and weather data.")
 
 @st.cache_data
 def load_data():
-    return pd.read_csv("Solar_Weather_Data_Processed.csv")
-
+    df = pd.read_csv("Solar_Weather_Data_Processed.csv")
+    df.columns = (
+        df.columns.astype(str)
+        .str.replace("\ufeff", "", regex=False)
+        .str.strip()
+        .str.replace(r"\s+", " ", regex=True)
+    )
+    return df
 @st.cache_resource
 def train_model(data):
     features = [
