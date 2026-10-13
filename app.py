@@ -111,3 +111,24 @@ try:
 except Exception as error:
     st.error("The model could not be trained. Check the data columns.")
     st.write(str(error))
+    st.divider()
+st.header("Solar Production Trend")
+
+trend_data = load_data()
+
+if "Timestamp" in trend_data.columns and "AC Output" in trend_data.columns:
+    trend_data["Timestamp"] = pd.to_datetime(
+        trend_data["Timestamp"], errors="coerce"
+    )
+    trend_data = trend_data.dropna(subset=["Timestamp", "AC Output"])
+    trend_data = trend_data.sort_values("Timestamp")
+
+    st.line_chart(
+        trend_data.set_index("Timestamp")["AC Output"]
+    )
+    st.caption(
+        "This chart shows actual solar power output over time. "
+        "A decline alone does not prove panel degradation."
+    )
+else:
+    st.warning("Required time or power columns were not found.")
